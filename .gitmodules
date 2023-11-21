@@ -1,0 +1,3 @@
+[submodule "src/main/cpp/third_party/EVA"]
+	path = src/main/cpp/third_party/EVA
+	url = https://github.com/microsoft/EVA.git
