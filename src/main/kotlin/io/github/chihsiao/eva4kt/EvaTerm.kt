@@ -1,34 +1,20 @@
 package io.github.chihsiao.eva4kt
 
-import io.github.chihsiao.eva4j.jni.EvaSharedTermJNI
+import io.github.chihsiao.eva4j.jni.EvaSharedTermJNI.destroy
+import io.github.chihsiao.eva4j.jni.EvaSharedTermJNI.getOp
 import io.github.chihsiao.eva4kt.enums.EvaOp
-import java.util.*
+import io.github.chihsiao.eva4kt.jni.JniPeer
 
-class EvaTerm private constructor(
-    val program: EvaProgram.Builder,
-    internal val handle: Long
-) {
+class EvaTerm private constructor(addr: Long)
+    : JniPeer(addr, ::destroy, true) {
     companion object {
-        private val cached by lazy { WeakHashMap<Long, EvaTerm>() }
-        fun fromHandle(program: EvaProgram.Builder, handle: Long): EvaTerm {
-            return cached.getOrElse(handle) {
-                EvaTerm(program, handle)
-            }.also {
-                if (it.program != program) {
-                    throw IllegalStateException()
+        operator fun invoke(builder: EvaProgramBuilder, addr: Long) =
+                fromAddress(::EvaTerm, addr).apply {
+                    this.builder = builder
                 }
-            }
-        }
     }
 
-    init {
-        cached[handle] = this
-    }
+    lateinit var builder: EvaProgramBuilder private set
 
-    protected fun finalize() {
-        EvaSharedTermJNI.destroy(handle)
-        cached.remove(handle)
-    }
-
-    val op: EvaOp get() = EvaOp.valueOf(EvaSharedTermJNI.getOp(handle))
+    val op: EvaOp by lazy { EvaOp.valueOf(getOp(nativeAddr)) }
 }

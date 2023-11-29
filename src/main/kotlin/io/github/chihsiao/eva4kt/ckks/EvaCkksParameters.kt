@@ -1,30 +1,16 @@
 package io.github.chihsiao.eva4kt.ckks
 
-import io.github.chihsiao.eva4j.jni.ckks.EvaCkksParametersJNI
-import java.util.*
+import io.github.chihsiao.eva4j.jni.ckks.EvaCkksParametersJNI.*
+import io.github.chihsiao.eva4kt.jni.JniPeer
 
-class EvaCkksParameters private constructor(
-    internal val handle: Long
-) {
+class EvaCkksParameters private constructor(addr: Long)
+    : JniPeer(addr, ::destroy, true) {
     companion object {
-        private val cached by lazy { WeakHashMap<Long, EvaCkksParameters>() }
-        fun fromHandle(handle: Long): EvaCkksParameters {
-            return cached.getOrElse(handle) {
-                EvaCkksParameters(handle)
-            }
-        }
+        internal operator fun invoke(addr: Long) =
+                fromAddress(::EvaCkksParameters, addr)
     }
 
-    init {
-        cached[handle] = this
-    }
-
-    protected fun finalize() {
-        EvaCkksParametersJNI.destroy(handle)
-        cached.remove(handle)
-    }
-
-    val primeBits: IntArray get() = EvaCkksParametersJNI.getPrimeBits(handle)
-    val rotations: Set<Int> get() = EvaCkksParametersJNI.getRotations(handle).toSet()
-    val polyModulusDegree: Int get() = EvaCkksParametersJNI.getPolyModulusDegree(handle)
+    val primeBits: IntArray by lazy { getPrimeBits(nativeAddr) }
+    val rotations: Set<Int> by lazy { getRotations(nativeAddr).toSet() }
+    val polyModulusDegree: Int by lazy { getPolyModulusDegree(nativeAddr) }
 }

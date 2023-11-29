@@ -1,39 +1,23 @@
 package io.github.chihsiao.eva4kt.ckks
 
-import io.github.chihsiao.eva4j.jni.ckks.EvaCkksCompilerJNI
+import io.github.chihsiao.eva4j.jni.ckks.EvaCkksCompilerJNI.*
 import io.github.chihsiao.eva4kt.EvaProgram
-import java.util.*
+import io.github.chihsiao.eva4kt.EvaProgramBuilder
+import io.github.chihsiao.eva4kt.jni.JniPeer
 
-class EvaCkksCompiler private constructor(
-    internal val handle: Long
-) {
+class EvaCkksCompiler private constructor(addr: Long)
+    : JniPeer(addr, ::destroy, true) {
     companion object {
-        private val cached by lazy { WeakHashMap<Long, EvaCkksCompiler>() }
-        fun fromHandle(handle: Long): EvaCkksCompiler {
-            return cached.getOrElse(handle) {
-                EvaCkksCompiler(handle)
-            }
-        }
+        internal operator fun invoke(addr: Long) =
+                fromAddress(::EvaCkksCompiler, addr)
     }
 
-    init {
-        cached[handle] = this
-    }
+    constructor() : this(create())
+    constructor(config: Map<String, String>) : this(createWithConfig(config))
 
-    constructor() : this(EvaCkksCompilerJNI.create())
-    constructor(config: Map<String, String>) : this(EvaCkksCompilerJNI.createWithConfig(config))
-
-    protected fun finalize() {
-        EvaCkksCompilerJNI.destroy(handle)
-        cached.remove(handle)
-    }
-
-    fun compile(program: EvaProgram): EvaProgram.CompiledProgram {
-        val handles: LongArray = EvaCkksCompilerJNI.compile(handle, program.handle)
-        val (programHandle, ckksParametersHandle, ckksSignatureHandle) = handles
-        return EvaProgram.CompiledProgram(programHandle,
-            EvaCkksParameters.fromHandle(ckksParametersHandle),
-            EvaCkksSignature.fromHandle(ckksSignatureHandle)
-        )
+    fun compile(program: EvaProgramBuilder): EvaProgram {
+        val addrs: LongArray = compile(nativeAddr, program.nativeAddr)
+        val (programAddr, ckksParametersAddr, ckksSignatureAddr) = addrs
+        return EvaProgram(programAddr, EvaCkksParameters(ckksParametersAddr), EvaCkksSignature(ckksSignatureAddr))
     }
 }

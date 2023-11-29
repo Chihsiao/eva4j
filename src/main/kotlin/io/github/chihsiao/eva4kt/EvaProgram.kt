@@ -1,78 +1,87 @@
 package io.github.chihsiao.eva4kt
 
-import io.github.chihsiao.eva4j.jni.EvaProgramJNI
+import io.github.chihsiao.eva4j.jni.EvaProgramJNI.*
 import io.github.chihsiao.eva4kt.ckks.EvaCkksParameters
 import io.github.chihsiao.eva4kt.ckks.EvaCkksSignature
-import io.github.chihsiao.eva4kt.enums.EvaType
 import io.github.chihsiao.eva4kt.enums.EvaOp
+import io.github.chihsiao.eva4kt.enums.EvaType
+import io.github.chihsiao.eva4kt.jni.JniPeer
 
-sealed class EvaProgram private constructor(
-    internal val handle: Long
-) {
-    protected fun finalize() {
-        EvaProgramJNI.destroy(handle)
+class EvaProgramBuilder private constructor(addr: Long)
+    : JniPeer(addr, ::destroy, true) {
+    companion object {
+        internal operator fun invoke(addr: Long) =
+                fromAddress(::EvaProgramBuilder, addr)
     }
 
-    open val name: String
-        get() = EvaProgramJNI.getName(handle)
+    constructor(name: String, vecSize: Long) : this(create(name, vecSize))
 
-    val vecSize: Long
-        get() = EvaProgramJNI.getVecSize(handle)
+    var name: String
+        get() = getName(nativeAddr)
+        set(value) = setName(nativeAddr, value)
 
-    class Builder internal constructor(handle: Long) : EvaProgram(handle) {
-        constructor(name: String, vecSize: Long) : this(EvaProgramJNI.create(name, vecSize))
+    val vecSize: Long by lazy { getVecSize(nativeAddr) }
 
-        override var name: String
-            get() = EvaProgramJNI.getName(handle)
-            set(value) { EvaProgramJNI.setName(handle, value) }
+    // TODO: inputs, outputs
 
-        // TODO: inputs, outputs
+    fun setInputsScale(scale: Int) = setInputScales(nativeAddr, scale)
+    fun setOutputsRange(range: Int) = setOutputRanges(nativeAddr, range)
 
-        fun setInputsScale(scale: Int) { EvaProgramJNI.setInputScales(handle, scale) }
-        fun setOutputsRange(range: Int) { EvaProgramJNI.setOutputRanges(handle, range) }
+    internal fun makeTerm(op: EvaOp, terms: Array<out EvaTerm>): EvaTerm =
+            EvaTerm(this, makeTerm(nativeAddr, op.value, terms.map { it.nativeAddr }.toLongArray()))
 
-        internal fun makeTerm(op: EvaOp, terms: Array<out EvaTerm>): EvaTerm =
-            EvaTerm.fromHandle(this, EvaProgramJNI.makeTerm(handle, op.value,
-                terms.map { it.handle }.toLongArray()))
+    internal fun makeLeftRotation(term: EvaTerm, slots: Int): EvaTerm =
+            EvaTerm(this, makeLeftRotation(nativeAddr, term.nativeAddr, slots))
 
-        internal fun makeInput(name: String, type: EvaType): EvaTerm =
-            EvaTerm.fromHandle(this, EvaProgramJNI.makeInput(handle, name, type.value))
+    internal fun makeRightRotation(term: EvaTerm, slots: Int): EvaTerm =
+            EvaTerm(this, makeRightRotation(nativeAddr, term.nativeAddr, slots))
 
-        internal fun makeOutput(name: String, term: EvaTerm): EvaTerm =
-            EvaTerm.fromHandle(this, EvaProgramJNI.makeOutput(handle, name, term.handle))
+    internal fun makeUniformConstant(value: Double): EvaTerm =
+            EvaTerm(this, makeUniformConstant(nativeAddr, value))
 
-        internal fun makeLeftRotation(term: EvaTerm, slots: Int): EvaTerm =
-            EvaTerm.fromHandle(this, EvaProgramJNI.makeLeftRotation(handle, term.handle, slots))
+    internal fun makeDenseConstant(values: DoubleArray): EvaTerm =
+            EvaTerm(this, makeDenseConstant(nativeAddr, values))
 
-        internal fun makeRightRotation(term: EvaTerm, slots: Int): EvaTerm =
-            EvaTerm.fromHandle(this, EvaProgramJNI.makeRightRotation(handle, term.handle, slots))
+    internal fun makeInput(name: String, type: EvaType): EvaTerm =
+            EvaTerm(this, makeInput(nativeAddr, name, type.value))
 
-        internal fun makeUniformConstant(value: Double): EvaTerm =
-            EvaTerm.fromHandle(this, EvaProgramJNI.makeUniformConstant(handle, value))
+    internal fun makeOutput(name: String, term: EvaTerm): EvaTerm =
+            EvaTerm(this, makeOutput(nativeAddr, name, term.nativeAddr))
 
-        internal fun makeDenseConstant(values: DoubleArray): EvaTerm =
-            EvaTerm.fromHandle(this, EvaProgramJNI.makeDenseConstant(handle, values))
-
-        fun input(name: String, isEncrypted: Boolean = true): EvaExpr {
-            return EvaExpr(makeInput(name, if (isEncrypted) EvaType.Cipher else EvaType.Plain), this)
-        }
-
-        fun output(name: String, expr: EvaExpr) {
-            makeOutput(name, expr.term)
-        }
+    fun input(name: String, isEncrypted: Boolean = true): EvaExpr {
+        return EvaExpr(this, makeInput(name, if (isEncrypted) EvaType.Cipher else EvaType.Plain))
     }
 
-    class CompiledProgram internal constructor(
-        handle: Long, val parameters: EvaCkksParameters,
-        val signature: EvaCkksSignature
-    ) : EvaProgram(handle) {
-        fun toDOT(): String = EvaProgramJNI.toDOT(handle)
+    fun output(name: String, expr: EvaExpr) {
+        makeOutput(name, expr.term)
     }
 }
 
+class EvaProgram private constructor(addr: Long)
+    : JniPeer(addr, ::destroy, true) {
+    companion object {
+        operator fun invoke(addr: Long) =
+                fromAddress(::EvaProgram, addr)
+
+        operator fun invoke(addr: Long, parameters: EvaCkksParameters, signature: EvaCkksSignature) =
+                fromAddress(::EvaProgram, addr).apply {
+                    this.parameters = parameters
+                    this.signature = signature
+                }
+    }
+
+    lateinit var parameters: EvaCkksParameters
+    lateinit var signature: EvaCkksSignature
+
+    val name: String by lazy { getName(nativeAddr) }
+    val vecSize: Long by lazy { getVecSize(nativeAddr) }
+
+    fun toDOT(): String = toDOT(nativeAddr)
+}
+
 inline fun buildEvaProgram(
-    name: String, vecSize: Long,
-    crossinline init: EvaProgram.Builder.() -> Unit
-): EvaProgram.Builder {
-    return EvaProgram.Builder(name, vecSize).apply(init)
+        name: String, vecSize: Long,
+        crossinline init: EvaProgramBuilder.() -> Unit
+): EvaProgramBuilder {
+    return EvaProgramBuilder(name, vecSize).apply(init)
 }

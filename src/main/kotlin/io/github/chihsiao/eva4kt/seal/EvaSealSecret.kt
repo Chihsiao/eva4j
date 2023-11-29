@@ -1,34 +1,17 @@
 package io.github.chihsiao.eva4kt.seal
 
-import io.github.chihsiao.eva4j.jni.seal.EvaSealSecretJNI
+import io.github.chihsiao.eva4j.jni.seal.EvaSealSecretJNI.decrypt
+import io.github.chihsiao.eva4j.jni.seal.EvaSealSecretJNI.destroy
 import io.github.chihsiao.eva4kt.ckks.EvaCkksSignature
-import java.util.*
+import io.github.chihsiao.eva4kt.jni.JniPeer
 
-class EvaSealSecret private constructor(
-    val public: EvaSealPublic, internal val handle: Long
-) {
+class EvaSealSecret private constructor(addr: Long)
+    : JniPeer(addr, ::destroy, true) {
     companion object {
-        private val cached by lazy { WeakHashMap<Long, EvaSealSecret>() }
-        fun fromHandle(public: EvaSealPublic, handle: Long): EvaSealSecret {
-            return cached.getOrElse(handle) {
-                EvaSealSecret(public, handle)
-            }.also {
-                if (it.public != public) {
-                    throw IllegalStateException()
-                }
-            }
-        }
-    }
-
-    init {
-        cached[handle] = this
-    }
-
-    protected fun finalize() {
-        EvaSealSecretJNI.destroy(handle)
-        cached.remove(handle)
+        internal operator fun invoke(addr: Long) =
+                fromAddress(::EvaSealSecret, addr)
     }
 
     fun decrypt(encOutputs: EvaSealValuation, signature: EvaCkksSignature): Map<String, DoubleArray> =
-        EvaSealSecretJNI.decrypt(handle, encOutputs.handle, signature.handle)
+            decrypt(nativeAddr, encOutputs.nativeAddr, signature.nativeAddr)
 }

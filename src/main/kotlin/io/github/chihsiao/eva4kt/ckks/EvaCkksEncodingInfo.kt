@@ -1,31 +1,17 @@
 package io.github.chihsiao.eva4kt.ckks
 
-import io.github.chihsiao.eva4j.jni.ckks.EvaCkksEncodingInfoJNI
+import io.github.chihsiao.eva4j.jni.ckks.EvaCkksEncodingInfoJNI.*
 import io.github.chihsiao.eva4kt.enums.EvaType
-import java.util.*
+import io.github.chihsiao.eva4kt.jni.JniPeer
 
-class EvaCkksEncodingInfo private constructor(
-    internal val handle: Long
-) {
+class EvaCkksEncodingInfo private constructor(addr: Long)
+    : JniPeer(addr, ::destroy, true) {
     companion object {
-        private val cached by lazy { WeakHashMap<Long, EvaCkksEncodingInfo>() }
-        fun fromHandle(handle: Long): EvaCkksEncodingInfo {
-            return cached.getOrElse(handle) {
-                EvaCkksEncodingInfo(handle)
-            }
-        }
+        internal operator fun invoke(addr: Long) =
+                fromAddress(::EvaCkksEncodingInfo, addr)
     }
 
-    init {
-        cached[handle] = this
-    }
-
-    protected fun finalize() {
-        EvaCkksEncodingInfoJNI.destroy(handle)
-        cached.remove(handle)
-    }
-
-    val level: Int get() = EvaCkksEncodingInfoJNI.getLevel(handle)
-    val inputType: EvaType get() = EvaType.valueOf(EvaCkksEncodingInfoJNI.getInputType(handle))
-    val scale: Int get() = EvaCkksEncodingInfoJNI.getScale(handle)
+    val level: Int by lazy { getLevel(nativeAddr) }
+    val inputType: EvaType by lazy { EvaType.valueOf(getInputType(nativeAddr)) }
+    val scale: Int by lazy { getScale(nativeAddr) }
 }

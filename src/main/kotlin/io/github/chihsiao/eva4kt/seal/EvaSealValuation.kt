@@ -1,26 +1,12 @@
 package io.github.chihsiao.eva4kt.seal
 
-import io.github.chihsiao.eva4j.jni.seal.EvaSealValuationJNI
-import java.util.*
+import io.github.chihsiao.eva4j.jni.seal.EvaSealValuationJNI.destroy
+import io.github.chihsiao.eva4kt.jni.JniPeer
 
-class EvaSealValuation private constructor(
-    internal val handle: Long
-) {
+class EvaSealValuation private constructor(addr: Long)
+    : JniPeer(addr, ::destroy, true) {
     companion object {
-        private val cached by lazy { WeakHashMap<Long, EvaSealValuation>() }
-        fun fromHandle(handle: Long): EvaSealValuation {
-            return cached.getOrElse(handle) {
-                EvaSealValuation(handle)
-            }
-        }
-    }
-
-    init {
-        cached[handle] = this
-    }
-
-    protected fun finalize() {
-        EvaSealValuationJNI.destroy(handle)
-        cached.remove(handle)
+        internal operator fun invoke(addr: Long) =
+                fromAddress(::EvaSealValuation, addr)
     }
 }
