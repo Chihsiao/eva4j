@@ -18,6 +18,6 @@ class EvaCkksCompiler private constructor(addr: Long)
     fun compile(program: EvaProgramBuilder): EvaProgram {
         val addrs: LongArray = compile(nativeAddr, program.nativeAddr)
         val (programAddr, ckksParametersAddr, ckksSignatureAddr) = addrs
-        return EvaProgram(programAddr, EvaCkksParameters(ckksParametersAddr), EvaCkksSignature(ckksSignatureAddr))
+        return EvaProgram(programAddr, EvaCkksParameters(ckksParametersAddr)!!, EvaCkksSignature(ckksSignatureAddr)!!)!!
     }
 }

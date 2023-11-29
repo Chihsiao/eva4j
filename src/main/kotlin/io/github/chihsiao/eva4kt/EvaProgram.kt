@@ -28,25 +28,25 @@ class EvaProgramBuilder private constructor(addr: Long)
     fun setOutputsRange(range: Int) = setOutputRanges(nativeAddr, range)
 
     internal fun makeTerm(op: EvaOp, terms: Array<out EvaTerm>): EvaTerm =
-            EvaTerm(this, makeTerm(nativeAddr, op.value, terms.map { it.nativeAddr }.toLongArray()))
+            EvaTerm(this, makeTerm(nativeAddr, op.value, terms.map { it.nativeAddr }.toLongArray()))!!
 
     internal fun makeLeftRotation(term: EvaTerm, slots: Int): EvaTerm =
-            EvaTerm(this, makeLeftRotation(nativeAddr, term.nativeAddr, slots))
+            EvaTerm(this, makeLeftRotation(nativeAddr, term.nativeAddr, slots))!!
 
     internal fun makeRightRotation(term: EvaTerm, slots: Int): EvaTerm =
-            EvaTerm(this, makeRightRotation(nativeAddr, term.nativeAddr, slots))
+            EvaTerm(this, makeRightRotation(nativeAddr, term.nativeAddr, slots))!!
 
     internal fun makeUniformConstant(value: Double): EvaTerm =
-            EvaTerm(this, makeUniformConstant(nativeAddr, value))
+            EvaTerm(this, makeUniformConstant(nativeAddr, value))!!
 
     internal fun makeDenseConstant(values: DoubleArray): EvaTerm =
-            EvaTerm(this, makeDenseConstant(nativeAddr, values))
+            EvaTerm(this, makeDenseConstant(nativeAddr, values))!!
 
     internal fun makeInput(name: String, type: EvaType): EvaTerm =
-            EvaTerm(this, makeInput(nativeAddr, name, type.value))
+            EvaTerm(this, makeInput(nativeAddr, name, type.value))!!
 
     internal fun makeOutput(name: String, term: EvaTerm): EvaTerm =
-            EvaTerm(this, makeOutput(nativeAddr, name, term.nativeAddr))
+            EvaTerm(this, makeOutput(nativeAddr, name, term.nativeAddr))!!
 
     fun input(name: String, isEncrypted: Boolean = true): EvaExpr {
         return EvaExpr(this, makeInput(name, if (isEncrypted) EvaType.Cipher else EvaType.Plain))
@@ -64,7 +64,7 @@ class EvaProgram private constructor(addr: Long)
                 fromAddress(::EvaProgram, addr)
 
         operator fun invoke(addr: Long, parameters: EvaCkksParameters, signature: EvaCkksSignature) =
-                fromAddress(::EvaProgram, addr).apply {
+                fromAddress(::EvaProgram, addr)?.apply {
                     this.parameters = parameters
                     this.signature = signature
                 }

@@ -12,6 +12,6 @@ class EvaCkksSignature private constructor(addr: Long)
 
     val vecSize: Int by lazy { getVecSize(nativeAddr) }
     val inputs: Map<String, EvaCkksEncodingInfo> by lazy {
-        getInputs(nativeAddr).mapValues { EvaCkksEncodingInfo(it.value) }
+        getInputs(nativeAddr).mapValues { EvaCkksEncodingInfo(it.value)!! }
     }
 }

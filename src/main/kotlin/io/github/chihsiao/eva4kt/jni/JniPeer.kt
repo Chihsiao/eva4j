@@ -1,5 +1,6 @@
 package io.github.chihsiao.eva4kt.jni
 
+import org.jetbrains.annotations.Contract
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
@@ -14,13 +15,14 @@ open class JniPeer(
 
         inline fun <reified T : Any> fromAddress(
                 noinline constructor: (Long) -> T, addr: Long
-        ): T = fromAddress(T::class, constructor, addr)
+        ): T? = fromAddress(T::class, constructor, addr)
 
         fun <T : Any> fromAddress(
                 type: KClass<out T>,
                 constructor: (Long) -> T,
                 addr: Long
-        ): T {
+        ): T? {
+            if (addr == 0L) return null
             return cachedJniPeers[addr]?.let { type.cast(it) } ?: constructor(addr)
         }
     }

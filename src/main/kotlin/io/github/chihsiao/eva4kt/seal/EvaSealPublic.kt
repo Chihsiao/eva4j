@@ -13,8 +13,8 @@ class EvaSealPublic private constructor(handle: Long)
     }
 
     fun execute(program: EvaProgram, inputs: EvaSealValuation): EvaSealValuation =
-            EvaSealValuation(execute(nativeAddr, program.nativeAddr, inputs.nativeAddr))
+            EvaSealValuation(execute(nativeAddr, program.nativeAddr, inputs.nativeAddr))!!
 
     fun encrypt(inputs: Map<String, DoubleArray>, signature: EvaCkksSignature): EvaSealValuation =
-            EvaSealValuation(encrypt(nativeAddr, inputs, signature.nativeAddr))
+            EvaSealValuation(encrypt(nativeAddr, inputs, signature.nativeAddr))!!
 }

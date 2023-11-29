@@ -5,5 +5,5 @@ import io.github.chihsiao.eva4kt.ckks.EvaCkksParameters
 
 fun generateKeys(ckksParameters: EvaCkksParameters): Pair<EvaSealPublic, EvaSealSecret> {
     val (sealPublicAddr, sealSecretAddr) = generateKeys(ckksParameters.nativeAddr)
-    return EvaSealPublic(sealPublicAddr) to EvaSealSecret(sealSecretAddr)
+    return EvaSealPublic(sealPublicAddr)!! to EvaSealSecret(sealSecretAddr)!!
 }
