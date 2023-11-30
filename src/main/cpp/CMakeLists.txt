@@ -29,6 +29,11 @@ target_sources(
         io.github.chihsiao.eva4j.jni/ckks/EvaCkksParametersJNI.cpp
         io.github.chihsiao.eva4j.jni/ckks/EvaCkksSignatureJNI.cpp)
 
+target_sources(
+        eva4j_native PRIVATE
+        io.github.chihsiao.eva4j.jni/serialization/EvaKnownTypeJNI.cpp
+        io.github.chihsiao.eva4j.jni/serialization/EvaSaveLoadJNI.cpp)
+
 target_include_directories(eva4j_native PUBLIC
         ${JNI_INCLUDE_DIRS} third_party/jni-bind
         ../../../build/generated/sources/headers/java/main)
