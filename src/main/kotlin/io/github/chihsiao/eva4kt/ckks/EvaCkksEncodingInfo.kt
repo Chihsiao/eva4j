@@ -8,7 +8,7 @@ class EvaCkksEncodingInfo private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
         internal operator fun invoke(addr: Long) =
-                fromAddress(::EvaCkksEncodingInfo, addr)
+                fromAddress(addr, ::EvaCkksEncodingInfo)
     }
 
     val level: Int by lazy { getLevel(nativeAddr) }

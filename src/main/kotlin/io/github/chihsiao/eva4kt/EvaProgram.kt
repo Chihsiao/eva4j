@@ -11,7 +11,7 @@ class EvaProgramBuilder private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
         internal operator fun invoke(addr: Long) =
-                fromAddress(::EvaProgramBuilder, addr)
+                fromAddress(addr, ::EvaProgramBuilder)
     }
 
     constructor(name: String, vecSize: Long) : this(create(name, vecSize))
@@ -61,12 +61,14 @@ class EvaProgram private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
         operator fun invoke(addr: Long) =
-                fromAddress(::EvaProgram, addr)
+                fromAddress(addr, ::EvaProgram)
 
         operator fun invoke(addr: Long, parameters: EvaCkksParameters, signature: EvaCkksSignature) =
-                fromAddress(::EvaProgram, addr)?.apply {
-                    this.parameters = parameters
-                    this.signature = signature
+                fromAddress(addr) {
+                    EvaProgram(it).apply {
+                        this.parameters = parameters
+                        this.signature = signature
+                    }
                 }
     }
 

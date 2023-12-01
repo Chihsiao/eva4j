@@ -13,7 +13,7 @@ class KnownType private constructor(addr: Long)
     : JniPeer(addr, ::destroy, false) {
     companion object {
         internal operator fun invoke(addr: Long) =
-                fromAddress(::KnownType, addr)
+                fromAddress(addr, ::KnownType)
     }
 
     fun getIfProgram(): EvaProgram? = EvaProgram(getIfProgram(nativeAddr))

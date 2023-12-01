@@ -9,7 +9,7 @@ class EvaTerm private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
         operator fun invoke(builder: EvaProgramBuilder, addr: Long) =
-                fromAddress(::EvaTerm, addr)?.apply {
+                fromAddress(addr, ::EvaTerm)?.apply {
                     this.builder = builder
                 }
     }

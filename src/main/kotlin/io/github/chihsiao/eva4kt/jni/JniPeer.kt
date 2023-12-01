@@ -14,13 +14,12 @@ open class JniPeer(
         private val cachedJniPeers by lazy { WeakHashMap<Pair<KClass<*>, Long>, WeakReference<JniPeer>>() }
 
         inline fun <reified T : Any> fromAddress(
-                noinline constructor: (Long) -> T, addr: Long
-        ): T? = fromAddress(T::class, constructor, addr)
+                addr: Long, noinline constructor: (Long) -> T
+        ): T? = fromAddress(T::class, addr, constructor)
 
         fun <T : Any> fromAddress(
                 type: KClass<out T>,
-                constructor: (Long) -> T,
-                addr: Long
+                addr: Long, constructor: (Long) -> T,
         ): T? {
             if (addr == 0L) return null
             val weakRef = cachedJniPeers[type to addr]

@@ -9,7 +9,7 @@ class EvaSealPublic private constructor(handle: Long)
     : JniPeer(handle, ::destroy, true) {
     companion object {
         internal operator fun invoke(addr: Long) =
-                fromAddress(::EvaSealPublic, addr)
+                fromAddress(addr, ::EvaSealPublic)
     }
 
     fun execute(program: EvaProgram, inputs: EvaSealValuation): EvaSealValuation =

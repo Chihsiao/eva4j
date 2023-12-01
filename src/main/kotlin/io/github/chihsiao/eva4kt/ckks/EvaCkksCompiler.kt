@@ -9,7 +9,7 @@ class EvaCkksCompiler private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
         internal operator fun invoke(addr: Long) =
-                fromAddress(::EvaCkksCompiler, addr)
+                fromAddress(addr, ::EvaCkksCompiler)
     }
 
     constructor() : this(create())

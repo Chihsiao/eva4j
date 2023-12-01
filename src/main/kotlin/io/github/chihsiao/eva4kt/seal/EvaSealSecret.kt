@@ -9,7 +9,7 @@ class EvaSealSecret private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
         internal operator fun invoke(addr: Long) =
-                fromAddress(::EvaSealSecret, addr)
+                fromAddress(addr, ::EvaSealSecret)
     }
 
     fun decrypt(encOutputs: EvaSealValuation, signature: EvaCkksSignature): Map<String, DoubleArray> =

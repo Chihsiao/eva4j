@@ -7,7 +7,7 @@ class EvaCkksParameters private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
         internal operator fun invoke(addr: Long) =
-                fromAddress(::EvaCkksParameters, addr)
+                fromAddress(addr, ::EvaCkksParameters)
     }
 
     val primeBits: IntArray by lazy { getPrimeBits(nativeAddr) }

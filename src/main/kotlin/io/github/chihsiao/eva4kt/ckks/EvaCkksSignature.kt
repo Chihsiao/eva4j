@@ -7,7 +7,7 @@ class EvaCkksSignature private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
         internal operator fun invoke(addr: Long) =
-                fromAddress(::EvaCkksSignature, addr)
+                fromAddress(addr, ::EvaCkksSignature)
     }
 
     val vecSize: Int by lazy { getVecSize(nativeAddr) }
