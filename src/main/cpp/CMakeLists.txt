@@ -35,8 +35,7 @@ target_sources(
         io.github.chihsiao.eva4j.jni/serialization/EvaSaveLoadJNI.cpp)
 
 target_include_directories(eva4j_native PUBLIC
-        ${JNI_INCLUDE_DIRS} third_party/jni-bind
-        ../../../build/generated/sources/headers/java/main)
+        ${JNI_INCLUDE_DIRS} ../../../build/generated/sources/headers/java/main)
 
 target_include_directories(eva4j_native PRIVATE java_classes)
 
