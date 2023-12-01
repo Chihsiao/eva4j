@@ -1,6 +1,7 @@
 package io.github.chihsiao.eva4kt
 
 import io.github.chihsiao.eva4j.jni.EvaProgramJNI.*
+import io.github.chihsiao.eva4j.jni.EvaSharedTermJNI
 import io.github.chihsiao.eva4kt.ckks.EvaCkksParameters
 import io.github.chihsiao.eva4kt.ckks.EvaCkksSignature
 import io.github.chihsiao.eva4kt.enums.EvaOp
@@ -21,6 +22,19 @@ class EvaProgramBuilder private constructor(addr: Long)
         set(value) = setName(nativeAddr, value)
 
     val vecSize: Long by lazy { getVecSize(nativeAddr) }
+
+    internal var ownedTerms: MutableSet<EvaTerm>? = mutableSetOf()
+
+    override fun finalize() {
+        val ownedTerms = this.ownedTerms!!
+        this.ownedTerms = null
+
+        ownedTerms.forEach {
+            EvaSharedTermJNI.destroy(it.release())
+        }
+
+        super.finalize()
+    }
 
     // TODO: inputs, outputs
 
