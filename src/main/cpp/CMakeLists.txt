@@ -19,6 +19,7 @@ target_sources(
         io.github.chihsiao.eva4j.jni/EvaProgramJNI.cpp
         io.github.chihsiao.eva4j.jni/EvaSharedTermJNI.cpp
 
+        io.github.chihsiao.eva4j.jni/seal/EvaSchemeValueJNI.cpp
         io.github.chihsiao.eva4j.jni/seal/EvaSealModuleJNI.cpp
         io.github.chihsiao.eva4j.jni/seal/EvaSealPublicJNI.cpp
         io.github.chihsiao.eva4j.jni/seal/EvaSealSecretJNI.cpp
@@ -37,6 +38,6 @@ target_sources(
 target_include_directories(eva4j_native PUBLIC
         ${JNI_INCLUDE_DIRS} ../../../build/generated/sources/headers/java/main)
 
-target_include_directories(eva4j_native PRIVATE java_classes)
+target_include_directories(eva4j_native PRIVATE java_classes utils)
 
 target_link_libraries(eva4j_native PUBLIC ${JNI_LIBRARIES} eva)
