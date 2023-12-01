@@ -1,6 +1,6 @@
 package io.github.chihsiao.eva4kt.jni
 
-import org.jetbrains.annotations.Contract
+import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
@@ -11,7 +11,7 @@ open class JniPeer(
         private val cacheIt: Boolean = false,
 ) {
     companion object {
-        private val cachedJniPeers by lazy { WeakHashMap<Long, JniPeer>() }
+        private val cachedJniPeers by lazy { WeakHashMap<Pair<KClass<*>, Long>, WeakReference<JniPeer>>() }
 
         inline fun <reified T : Any> fromAddress(
                 noinline constructor: (Long) -> T, addr: Long
@@ -23,7 +23,15 @@ open class JniPeer(
                 addr: Long
         ): T? {
             if (addr == 0L) return null
-            return cachedJniPeers[addr]?.let { type.cast(it) } ?: constructor(addr)
+            val weakRef = cachedJniPeers[type to addr]
+            if (weakRef != null) {
+                val ref = weakRef.get()
+                if (ref != null) return type.cast(ref) else {
+                    cachedJniPeers.remove(type to addr, weakRef)
+                }
+            }
+
+            return constructor(addr)
         }
     }
 
@@ -32,7 +40,7 @@ open class JniPeer(
 
     internal fun release(): Long {
         if (nativeAddr != 0L && cacheIt)
-            cachedJniPeers.remove(nativeAddr)
+            cachedJniPeers.remove(this::class to nativeAddr)
         val ret = nativeAddr
         nativeAddr = 0L
         return ret
@@ -40,22 +48,25 @@ open class JniPeer(
 
     init {
         if (nativeAddr != 0L && cacheIt) {
-            cachedJniPeers[nativeAddr] = this
+            cachedJniPeers[this::class to nativeAddr] = WeakReference(this)
         }
     }
 
     protected open fun finalize() {
         if (nativeAddr != 0L) {
             nativeDeleter(nativeAddr)
-            if (cacheIt) cachedJniPeers.remove(nativeAddr)
+            if (cacheIt) cachedJniPeers.remove(this::class to nativeAddr)
         }
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is JniPeer) return false
-        if (nativeAddr != other.nativeAddr) return false
-        return true
+        if (javaClass != other?.javaClass) {
+            return false
+        }
+
+        other as JniPeer
+        return nativeAddr == other.nativeAddr
     }
 
     override fun hashCode(): Int {
