@@ -15,6 +15,8 @@ Java_io_github_chihsiao_eva4j_jni_seal_EvaSealSecretJNI_destroy
 JNIEXPORT jobject JNICALL
 Java_io_github_chihsiao_eva4j_jni_seal_EvaSealSecretJNI_decrypt
 (JNIEnv *, jclass, jlong sealSecretAddr, jlong sealValuationAddr, jlong ckksSignatureAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& sealSecret = *(eva::SEALSecret*) sealSecretAddr;
     auto& sealValuation = *(eva::SEALValuation*) sealValuationAddr;
     auto& ckksSignature = *(eva::CKKSSignature*) ckksSignatureAddr;

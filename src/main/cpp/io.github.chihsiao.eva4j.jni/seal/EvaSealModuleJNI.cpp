@@ -8,6 +8,8 @@ using namespace jni;
 JNIEXPORT jlongArray JNICALL
 Java_io_github_chihsiao_eva4j_jni_seal_EvaSealModuleJNI_generateKeys
 (JNIEnv *, jclass, jlong ckksParametersAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& ckksParameters = *(eva::CKKSParameters*) ckksParametersAddr;
     auto nRet = generateKeys(ckksParameters);
 

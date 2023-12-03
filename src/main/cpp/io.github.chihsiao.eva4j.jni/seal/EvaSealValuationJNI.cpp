@@ -23,6 +23,8 @@ Java_io_github_chihsiao_eva4j_jni_seal_EvaSealValuationJNI_destroy
 JNIEXPORT jobjectArray JNICALL
 Java_io_github_chihsiao_eva4j_jni_seal_EvaSealValuationJNI_getKeys
 (JNIEnv *, jclass, jlong sealValuationAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& sealValuation = *(eva::SEALValuation*) sealValuationAddr;
     std::vector<std::string> keys; {
         for (auto const& item : sealValuation) {
@@ -42,6 +44,8 @@ Java_io_github_chihsiao_eva4j_jni_seal_EvaSealValuationJNI_getKeys
 JNIEXPORT jlong JNICALL
 Java_io_github_chihsiao_eva4j_jni_seal_EvaSealValuationJNI_getValue
 (JNIEnv *, jclass, jlong sealValuationAddr, jstring jKey_obj) {
+    jni::ThreadGuard threadGuard;
+
     auto& sealValuation = *(eva::SEALValuation*) sealValuationAddr;
     std::string key(LocalString { jKey_obj }.Pin().ToString());
     auto& nRet = sealValuation[key];
@@ -52,6 +56,8 @@ Java_io_github_chihsiao_eva4j_jni_seal_EvaSealValuationJNI_getValue
 JNIEXPORT void JNICALL
 Java_io_github_chihsiao_eva4j_jni_seal_EvaSealValuationJNI_setValue
 (JNIEnv *, jclass, jlong sealValuationAddr, jstring jKey_obj, jlong schemeValueAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& sealValuation = *(eva::SEALValuation*) sealValuationAddr;
     std::string key(LocalString { jKey_obj }.Pin().ToString());
     auto& schemeValue = *(eva::SchemeValue*) schemeValueAddr;

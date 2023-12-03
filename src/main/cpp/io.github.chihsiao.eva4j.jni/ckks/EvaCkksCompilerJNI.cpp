@@ -18,6 +18,8 @@ Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksCompilerJNI_create
 JNIEXPORT jlong JNICALL
 Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksCompilerJNI_createWithConfig
 (JNIEnv *, jclass, jobject jCkksConfigMap_obj) {
+    jni::ThreadGuard threadGuard;
+
     std::unordered_map<std::string, std::string> ckksConfigMap; {
         LocalObject<java::util::Map> jCkksConfigMap { jCkksConfigMap_obj };
         auto iterator = jCkksConfigMap("entrySet")("iterator");
@@ -47,6 +49,8 @@ Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksCompilerJNI_destroy
 JNIEXPORT jlongArray JNICALL
 Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksCompilerJNI_compile
 (JNIEnv *, jclass, jlong ckksCompilerAddr, jlong programAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& ckksCompiler = *(eva::CKKSCompiler*) ckksCompilerAddr;
     auto& program = *(eva::Program*) programAddr;
     auto nRet = ckksCompiler.compile(program);

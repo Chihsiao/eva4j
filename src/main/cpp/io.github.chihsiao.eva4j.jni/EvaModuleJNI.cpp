@@ -10,6 +10,8 @@ using namespace jni;
 JNIEXPORT jobject JNICALL
 Java_io_github_chihsiao_eva4j_jni_EvaModuleJNI_evaluate
 (JNIEnv *env, jclass, jlong programHandle, jobject jInputs_obj) {
+    jni::ThreadGuard threadGuard;
+
     std::unordered_map<std::string, std::vector<double>> inputs; {
         LocalObject<java::util::Map> jInputs { jInputs_obj };
         auto iterator = jInputs("entrySet")("iterator");

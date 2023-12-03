@@ -29,6 +29,8 @@ Java_io_github_chihsiao_eva4j_jni_seal_EvaSealPublicJNI_execute
 JNIEXPORT jlong JNICALL
 Java_io_github_chihsiao_eva4j_jni_seal_EvaSealPublicJNI_encrypt
 (JNIEnv *, jclass, jlong sealPublicAddr, jobject jInputs_obj, jlong ckksSignatureAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& sealPublic = *(eva::SEALPublic*) sealPublicAddr;
 
     std::unordered_map<std::string, std::vector<double>> inputs; {

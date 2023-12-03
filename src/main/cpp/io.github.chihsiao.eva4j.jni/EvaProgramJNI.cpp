@@ -8,6 +8,8 @@ using namespace jni;
 JNIEXPORT jlong JNICALL
 Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_create
 (JNIEnv *, jclass, jstring jName_obj, jlong vecSize) {
+    jni::ThreadGuard threadGuard;
+
     LocalString jName { jName_obj };
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "MemoryLeak"
@@ -24,6 +26,8 @@ Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_destroy
 JNIEXPORT jstring JNICALL
 Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_getName
 (JNIEnv *, jclass, jlong programAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& program = *(eva::Program*) programAddr;
     LocalString ret { program.getName() };
     return ret.Release();
@@ -32,6 +36,8 @@ Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_getName
 JNIEXPORT void JNICALL
 Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_setName
 (JNIEnv *, jclass, jlong programAddr, jstring jName_obj) {
+    jni::ThreadGuard threadGuard;
+
     std::string name { LocalString { jName_obj }.Pin().ToString() };
     auto& program = *(eva::Program*) programAddr;
 
@@ -66,6 +72,8 @@ Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_setOutputRanges
 JNIEXPORT jlong JNICALL
 Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_makeTerm
 (JNIEnv *, jclass, jlong programAddr, jint jOp, jlongArray jSharedTermAddrs_obj) {
+    jni::ThreadGuard threadGuard;
+
     auto& program = *(eva::Program*) programAddr;
     std::vector<std::shared_ptr<eva::Term>> operands; {
         LocalArray<jlong> jSharedTermAddrs { jSharedTermAddrs_obj }; {
@@ -83,6 +91,8 @@ Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_makeTerm
 JNIEXPORT jlong JNICALL
 Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_makeInput
 (JNIEnv *, jclass, jlong programAddr, jstring jName_obj, jint jType) {
+    jni::ThreadGuard threadGuard;
+
     std::string name { LocalString { jName_obj }.Pin().ToString() };
     auto& program = *(eva::Program*) programAddr;
 
@@ -93,6 +103,8 @@ Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_makeInput
 JNIEXPORT jlong JNICALL
 Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_makeOutput
 (JNIEnv *, jclass, jlong programAddr, jstring jName_obj, jlong sharedTermAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& program = *(eva::Program*) programAddr;
     std::string name { LocalString { jName_obj }.Pin().ToString() };
     auto& sharedTerm = *(std::shared_ptr<eva::Term>*) sharedTermAddr;
@@ -133,6 +145,8 @@ Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_makeUniformConstant
 JNIEXPORT jlong JNICALL
 Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_makeDenseConstant
 (JNIEnv *, jclass, jlong programAddr, jdoubleArray jValues_obj) {
+    jni::ThreadGuard threadGuard;
+
     auto& program = *(eva::Program*) programAddr;
     LocalArray<jdouble> jValues { jValues_obj };
     std::vector<double> values(jValues.Length()); {
@@ -147,6 +161,8 @@ Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_makeDenseConstant
 JNIEXPORT jstring JNICALL
 Java_io_github_chihsiao_eva4j_jni_EvaProgramJNI_toDOT
 (JNIEnv *, jclass, jlong programAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& program = *(eva::Program*) programAddr;
     LocalString ret { program.toDOT() };
     return ret.Release();

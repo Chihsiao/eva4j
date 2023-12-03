@@ -14,6 +14,8 @@ Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksParametersJNI_destroy
 JNIEXPORT jintArray JNICALL
 Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksParametersJNI_getPrimeBits
 (JNIEnv *, jclass, jlong ckksParametersAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& ckksParameters = *(eva::CKKSParameters*) ckksParametersAddr;
     LocalArray<jint> ret { ckksParameters.primeBits.size() }; {
         auto arrayView = ret.Pin();
@@ -28,6 +30,8 @@ Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksParametersJNI_getPrimeBits
 JNIEXPORT jintArray JNICALL
 Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksParametersJNI_getRotations
 (JNIEnv *, jclass, jlong ckksParametersAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& ckksParameters = *(eva::CKKSParameters*) ckksParametersAddr;
     LocalArray<jint> ret { ckksParameters.rotations.size() }; {
         auto arrayView = ret.Pin();

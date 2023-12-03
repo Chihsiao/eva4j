@@ -22,6 +22,8 @@ Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksSignatureJNI_getVecSize
 JNIEXPORT jobject JNICALL
 Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksSignatureJNI_getInputs
 (JNIEnv *, jclass, jlong ckksSignatureAddr) {
+    jni::ThreadGuard threadGuard;
+
     auto& ckksSignature = *(eva::CKKSSignature*) ckksSignatureAddr;
     LocalObject<java::util::HashMap> ret {}; {
         for (auto& item: ckksSignature.inputs) {
