@@ -6,6 +6,27 @@ using namespace jni;
 #include "eva/eva.h"
 #include "java/lang/Long.h"
 #include "java/util/HashMap.h"
+#include "java/util/Map.h"
+
+JNIEXPORT jlong JNICALL
+Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksSignatureJNI_create
+(JNIEnv *, jclass, jint vecSize, jobject jInputs_obj) {
+    jni::ThreadGuard threadGuard;
+
+    std::unordered_map<std::string, eva::CKKSEncodingInfo> inputs; {
+        LocalObject<java::util::Map> jInputs { jInputs_obj };
+        auto iterator = jInputs("entrySet")("iterator");
+        while (iterator("hasNext")) {
+            LocalObject<java::util::Map$Entry> next = iterator("next");
+            LocalString key { (jstring) next("getKey").Release() };
+            LocalObject<java::lang::Long> jCkksEncodingInfoAddr = next("getValue");
+            auto& input = *(eva::CKKSEncodingInfo*) jCkksEncodingInfoAddr("longValue");
+            inputs.emplace(key.Pin().ToString(), eva::CKKSEncodingInfo(input));
+        }
+    }
+
+    return (jlong) new eva::CKKSSignature(vecSize, std::move(inputs));
+}
 
 JNIEXPORT void JNICALL
 Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksSignatureJNI_destroy

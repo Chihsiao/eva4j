@@ -5,6 +5,12 @@ using namespace jni;
 
 #include "eva/eva.h"
 
+JNIEXPORT jlong JNICALL
+Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksEncodingInfoJNI_create
+(JNIEnv *, jclass, jint inputType, jint scale, jint level) {
+    return (jlong) new eva::CKKSEncodingInfo((eva::Type) inputType, scale, level);
+}
+
 JNIEXPORT void JNICALL
 Java_io_github_chihsiao_eva4j_jni_ckks_EvaCkksEncodingInfoJNI_destroy
 (JNIEnv *, jclass, jlong ckksEncodingInfoAddr) {

@@ -5,6 +5,7 @@ import java.util.Map;
 public final class EvaCkksSignatureJNI {
     private EvaCkksSignatureJNI() {}
 
+    public static native long create(int vecSize, Map<String, Long> inputs);
     public static native void destroy(long ckksSignatureAddr);
 
     public static native int getVecSize(long ckksSignatureAddr);

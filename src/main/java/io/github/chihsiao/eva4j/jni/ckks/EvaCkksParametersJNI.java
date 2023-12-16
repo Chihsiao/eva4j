@@ -3,6 +3,7 @@ package io.github.chihsiao.eva4j.jni.ckks;
 public final class EvaCkksParametersJNI {
     private EvaCkksParametersJNI() {}
 
+    public static native long create(int[] primeBits, int[] rotations, int polyModulusDegree);
     public static native void destroy(long ckksParametersAddr);
 
     public static native int[] getPrimeBits(long ckksParametersAddr);

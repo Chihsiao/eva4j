@@ -10,6 +10,9 @@ class EvaCkksParameters private constructor(addr: Long)
                 fromAddress(addr, ::EvaCkksParameters)
     }
 
+    constructor(primeBits: IntArray, rotations: Set<Int>, polyModulusDegree: Int)
+            : this(create(primeBits, rotations.toIntArray(), polyModulusDegree))
+
     val primeBits: IntArray by lazy { getPrimeBits(nativeAddr) }
     val rotations: Set<Int> by lazy { getRotations(nativeAddr).toSet() }
     val polyModulusDegree: Int by lazy { getPolyModulusDegree(nativeAddr) }

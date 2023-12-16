@@ -11,6 +11,9 @@ class EvaCkksEncodingInfo private constructor(addr: Long)
                 fromAddress(addr, ::EvaCkksEncodingInfo)
     }
 
+    constructor(inputType: EvaType, scale: Int, level: Int)
+            : this(create(inputType.value, scale, level))
+
     val level: Int by lazy { getLevel(nativeAddr) }
     val inputType: EvaType by lazy { EvaType.valueOf(getInputType(nativeAddr)) }
     val scale: Int by lazy { getScale(nativeAddr) }

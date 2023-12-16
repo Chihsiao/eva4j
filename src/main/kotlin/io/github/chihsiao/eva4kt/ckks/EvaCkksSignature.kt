@@ -10,6 +10,9 @@ class EvaCkksSignature private constructor(addr: Long)
                 fromAddress(addr, ::EvaCkksSignature)
     }
 
+    constructor(vecSize: Int, inputs: Map<String, EvaCkksEncodingInfo>) :
+            this(create(vecSize, inputs.mapValues { it.value.nativeAddr }))
+
     val vecSize: Int by lazy { getVecSize(nativeAddr) }
     val inputs: Map<String, EvaCkksEncodingInfo> by lazy {
         getInputs(nativeAddr).mapValues { EvaCkksEncodingInfo(it.value)!! }
