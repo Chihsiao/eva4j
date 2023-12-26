@@ -5,7 +5,7 @@ import io.github.chihsiao.eva4kt.jni.JniPeer
 import java.lang.ref.WeakReference
 
 class EvaSealValuation private constructor(addr: Long)
-    : JniPeer(addr, ::destroy, true) {
+    : JniPeer(addr, ::destroy, false) {
     companion object {
         internal operator fun invoke(addr: Long) =
                 fromAddress(addr, ::EvaSealValuation)
