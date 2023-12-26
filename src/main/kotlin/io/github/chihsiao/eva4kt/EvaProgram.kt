@@ -74,10 +74,10 @@ class EvaProgramBuilder private constructor(addr: Long)
 class EvaProgram private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
-        operator fun invoke(addr: Long) =
+        internal operator fun invoke(addr: Long) =
                 fromAddress(addr, ::EvaProgram)
 
-        operator fun invoke(addr: Long, parameters: EvaCkksParameters, signature: EvaCkksSignature) =
+        internal operator fun invoke(addr: Long, parameters: EvaCkksParameters, signature: EvaCkksSignature) =
                 fromAddress(addr) {
                     EvaProgram(it).apply {
                         this.parameters = parameters

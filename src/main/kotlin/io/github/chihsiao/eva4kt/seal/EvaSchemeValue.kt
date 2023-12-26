@@ -6,7 +6,7 @@ import io.github.chihsiao.eva4kt.jni.JniPeer
 class EvaSchemeValue private constructor(addr: Long)
     : JniPeer(addr, ::destroy, true) {
     companion object {
-        operator fun invoke(addr: Long) =
+        internal operator fun invoke(addr: Long) =
                 fromAddress(addr, ::EvaSchemeValue)
     }
 }
