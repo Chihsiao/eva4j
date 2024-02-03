@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 project(eva4j_native)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 
 find_package(Java 1.8 REQUIRED COMPONENTS Development)
 find_package(JNI REQUIRED)
